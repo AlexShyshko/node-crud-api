@@ -1,0 +1,32 @@
+{
+    "name": "node-crud-api",
+    "version": "1.0.0",
+    "description": "Learning project. Description: https://github.com/AlreadyBored/nodejs-assignments/blob/main/assignments/crud-api/assignment.md",
+    "engines": {
+        "node": "22.14.0"
+    },
+    "type": "module",
+    "main": "src/index.ts",
+    "scripts": {
+        "start": "node src/index.ts"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/AlexShyshko/node-crud-api.git"
+    },
+    "keywords": [
+        "nodejs",
+        "node.js course",
+        "rss",
+        "rs school",
+        "rolling scopes school",
+        "crud-api",
+        "crud api"
+    ],
+    "author": "AlexShyshko",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/AlexShyshko/node-crud-api/pull/1"
+    },
+    "homepage": "https://github.com/AlexShyshko/node-crud-api#readme"
+}
