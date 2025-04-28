@@ -5,10 +5,13 @@
     "engines": {
         "node": "22.14.0"
     },
-    "type": "module",
     "main": "src/index.ts",
     "scripts": {
-        "start": "node src/index.ts"
+        "start:dev": "cross-env APPLICATION_USERNAME=RSS_Cross_Checker ts-node-dev src/index.ts",
+        "start:prod": "webpack && cross-env APPLICATION_USERNAME=RSS_Cross_Checker node dist/index.js",
+        "start:multi": "",
+        "lint": "eslint src tests",
+        "lint:fix": "eslint src tests --fix"
     },
     "repository": {
         "type": "git",
@@ -28,5 +31,27 @@
     "bugs": {
         "url": "https://github.com/AlexShyshko/node-crud-api/pull/1"
     },
-    "homepage": "https://github.com/AlexShyshko/node-crud-api#readme"
+    "homepage": "https://github.com/AlexShyshko/node-crud-api#readme",
+    "dependencies": {
+        "dotenv": "^16.5.0",
+        "uuid": "^11.1.0"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.25.1",
+        "@types/node": "^22.15.2",
+        "@types/uuid": "^10.0.0",
+        "@typescript-eslint/eslint-plugin": "^8.31.0",
+        "@typescript-eslint/parser": "^8.31.0",
+        "cross-env": "^7.0.3",
+        "eslint": "^9.25.1",
+        "eslint-plugin-prettier": "^5.2.6",
+        "eslint-webpack-plugin": "^5.0.1",
+        "prettier": "^3.5.3",
+        "ts-loader": "^9.5.2",
+        "ts-node": "^10.9.2",
+        "ts-node-dev": "^2.0.0",
+        "typescript": "^5.8.3",
+        "webpack": "^5.99.6",
+        "webpack-cli": "^6.0.1"
+    }
 }
