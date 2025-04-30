@@ -19,6 +19,9 @@ export default {
       },
     ],
   },
+  resolve: {
+    extensions: ['.ts', '.js'],
+  },
   plugins: [
     ...[new ESLintPlugin({
       extensions: ['ts', 'js'],
