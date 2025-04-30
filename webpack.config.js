@@ -1,4 +1,4 @@
-import path from 'path';
+import path, { resolve } from 'path';
 import ESLintPlugin from 'eslint-webpack-plugin';
 
 export default {

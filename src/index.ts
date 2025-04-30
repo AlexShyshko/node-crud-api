@@ -1,9 +1,13 @@
 import dotenv from 'dotenv';
-dotenv.config();
+import { serverUtils } from './server-utils/server-utils';
 
-console.log('APPLICATION_USERNAME = ' + (process.env.APPLICATION_USERNAME as string));
-console.log('API = ' + (`${process.env.HOST!}:${process.env.PORT!}${process.env.API_BASE_PATH!}${process.env.API_USERS_PATH!}`));
+try {
 
-process.stdin.on('data', (input) => {
-	console.log('Input = ' + String(input));
-});
+	dotenv.config();
+	serverUtils.getNewDefaultServer();
+
+
+
+} catch (e) {
+	console.log(e);
+}

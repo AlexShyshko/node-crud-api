@@ -17,7 +17,8 @@ export default defineConfig([
 			'prefer-const': 'error',
 			'no-constant-binary-expression': 'error',
             '@typescript-eslint/no-non-null-assertion': 'off',
-            '@typescript-eslint/non-nullable-type-assertion-style': 'off'
+            '@typescript-eslint/non-nullable-type-assertion-style': 'off',
+			'@typescript-eslint/no-unnecessary-condition': 'off'
 		},
 		languageOptions: {
 			ecmaVersion: 'latest',
