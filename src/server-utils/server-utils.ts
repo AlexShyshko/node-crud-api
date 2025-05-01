@@ -1,20 +1,57 @@
 import { ServerUtilsInterface } from '../types-and-interfaces';
-import { createServer, RequestListener, IncomingMessage, ServerResponse, STATUS_CODES } from 'http';
+import { /*Server as NodeHttpServer, */createServer, RequestListener, IncomingMessage, ServerResponse, request as NodeHttpServerRequest , STATUS_CODES } from 'http';
 import { API } from '../api/api';
+import { mc } from '../message-colorizer/message-colorizer';
+import cluster from 'cluster';
 
 class ServerUtils implements ServerUtilsInterface {
 
-    public getNewDefaultServer = () => {
+    #loadBalancerWorkerIndex: number;
+    #loadBalancerWorkerIndexEnd: number;
+    #destinationPort: string;
+    #balancerMapPort: Map<number, string>;
+
+    constructor() {
+        this.#loadBalancerWorkerIndex = 0;
+        this.#loadBalancerWorkerIndexEnd = 0;
+        this.#destinationPort = '';
+        this.#balancerMapPort = new Map();
+    };
+
+    public getDataBaseServer = (port: string, host: string) => {
 
         const newServer = createServer();
-        newServer.on('request', this.#getDefaultRequestListener());
-        newServer.listen({ port: process.env.PORT, host: process.env.HOST });
+        newServer.on('request', this.#getDataBaseRequestListener());
+        newServer.listen({ port: port, host: host });
+        console.log(`${mc.colorize('A new data base server created: ', 'green')}${mc.colorize(host + ':' + port, 'yellow')}`);
         
         return newServer;
 
     };
 
-    #getDefaultRequestListener = (): RequestListener => {
+    public getLoadBalancer = (port: string, host: string) => {
+
+        const newServer = createServer();
+        newServer.on('request', this.#getLoadBalancerRequestListener());
+        newServer.listen({ port: port, host: host });
+        console.log(`${mc.colorize('A new load balancer created: ', 'green')}${mc.colorize(host + ':' + port, 'yellow')}`);
+
+        return newServer;
+
+    };
+
+    public getApplicationInstance = (port: string, host: string) => {
+
+        const newServer = createServer();
+        newServer.on('request', this.#getApplicationInstanceRequestListener());
+        newServer.listen({ port: port, host: host });
+        console.log(`${mc.colorize('A new application instance created: ', 'green')}${mc.colorize(host + ':' + port, 'yellow')}`);
+
+        return newServer;
+
+    };
+
+    #getDataBaseRequestListener = (): RequestListener => {
 
         return (request: IncomingMessage, response: ServerResponse) => {
 
@@ -31,6 +68,7 @@ class ServerUtils implements ServerUtilsInterface {
                 request.on('end', () => {
     
                     const apiResponse = API.processRequest(requestMethod, requestUrl, body);
+                    console.log(`${mc.colorize('API Response: \n', 'green')}${mc.colorize(apiResponse, 'yellow')}`);
                     response.statusMessage = apiResponse.statusMessage;
                     response.writeHead(apiResponse.statusCode, {'content-type': process.env.CONTENT_TYPE});
                     const responseBody = JSON.stringify(apiResponse.body);
@@ -39,7 +77,8 @@ class ServerUtils implements ServerUtilsInterface {
                 });
     
                 request.on('error', (requestError) => {
-    
+
+                    console.log(mc.colorize(requestError as object, 'red'));
                     response.statusMessage = STATUS_CODES[Number(process.env.CODE_SERVER_ERROR)]!;
                     response.writeHead(Number(process.env.CODE_SERVER_ERROR), {'content-type': process.env.CONTENT_TYPE});
                     const responseBody = JSON.stringify({ Error: requestError.message });
@@ -48,6 +87,8 @@ class ServerUtils implements ServerUtilsInterface {
                 });
 
             } catch (e) {
+
+                console.log(mc.colorize(e as object, 'red'));
 
                 if (e instanceof Error) {
 
@@ -69,6 +110,134 @@ class ServerUtils implements ServerUtilsInterface {
 
         };
 
+    };
+
+    #getLoadBalancerRequestListener = (): RequestListener => {
+
+        return (request: IncomingMessage, response: ServerResponse) => {
+
+            try {
+
+                const workerKeys = Object.keys(cluster.workers!);
+                const currentWorkerIndex = workerKeys[this.#loadBalancerWorkerIndex];
+                const currentWorkerId = cluster.workers![currentWorkerIndex]?.id;
+
+                const requestOptions = {
+                    hostname: process.env.HOST!,
+                    port: this.#balancerMapPort.get(currentWorkerId!),
+                    path: request.url,
+                    method: request.method,
+                    headers: request.headers,
+                };
+
+                const proxyRequest = NodeHttpServerRequest(requestOptions, (proxyResponse) => {
+                    
+                    response.statusMessage = proxyResponse.statusMessage!;
+                    response.writeHead(proxyResponse.statusCode!, proxyResponse.headers);
+                    
+                    proxyResponse.pipe(response);
+
+                });
+                
+                console.log(`${mc.colorize('Request to', 'green')} ${mc.colorize(process.env.HOST! + ':' + process.env.PORT!, 'yellow')} ${mc.colorize('is redirected to', 'green')} ${mc.colorize(process.env.HOST! + ':' + requestOptions.port!, 'yellow')}`);
+
+                request.pipe(proxyRequest);
+
+                this.#loadBalancerWorkerIndex += 1;
+
+                if (this.#loadBalancerWorkerIndex === this.#loadBalancerWorkerIndexEnd) {
+                    this.#loadBalancerWorkerIndex = 0;
+                }
+
+            } catch (e) {
+
+                console.log(mc.colorize(e as object, 'red'));
+
+                if (e instanceof Error) {
+
+                    response.statusMessage = STATUS_CODES[Number(process.env.CODE_SERVER_ERROR)]!;
+                    response.writeHead(Number(process.env.CODE_SERVER_ERROR), {'content-type': process.env.CONTENT_TYPE});
+                    const responseBody = JSON.stringify({ Error: e.message });
+                    response.end(responseBody);
+
+                } else {
+
+                    response.statusMessage = STATUS_CODES[Number(process.env.CODE_SERVER_ERROR)]!;
+                    response.writeHead(Number(process.env.CODE_SERVER_ERROR), {'content-type': process.env.CONTENT_TYPE});
+                    const responseBody = JSON.stringify({ Error: 'Unknown server error' });
+                    response.end(responseBody);
+
+                }
+
+            }
+
+        };
+
+    };
+
+    #getApplicationInstanceRequestListener = (): RequestListener => {
+
+        return (request: IncomingMessage, response: ServerResponse) => {
+
+            try {
+
+                const requestOptions = {
+                    hostname: process.env.HOST!,
+                    port: process.env.DESTINATION_PORT!,
+                    path: request.url,
+                    method: request.method,
+                    headers: request.headers,
+                };
+
+                const proxyRequest = NodeHttpServerRequest(requestOptions, (proxyResponse) => {
+                    
+                    response.statusMessage = proxyResponse.statusMessage!;
+                    response.writeHead(proxyResponse.statusCode!, proxyResponse.headers);
+
+                    proxyResponse.pipe(response);
+
+                });
+
+                console.log(`${mc.colorize('Response from', 'green')} ${mc.colorize(process.env.HOST! + ':' + process.env.PORT!, 'yellow')}${mc.colorize(':', 'green')}`);
+
+                request.pipe(proxyRequest);
+
+            } catch (e) {
+
+                console.log(mc.colorize(e as object, 'red'));
+
+                if (e instanceof Error) {
+
+                    response.statusMessage = STATUS_CODES[Number(process.env.CODE_SERVER_ERROR)]!;
+                    response.writeHead(Number(process.env.CODE_SERVER_ERROR), {'content-type': process.env.CONTENT_TYPE});
+                    const responseBody = JSON.stringify({ Error: e.message });
+                    response.end(responseBody);
+
+                } else {
+
+                    response.statusMessage = STATUS_CODES[Number(process.env.CODE_SERVER_ERROR)]!;
+                    response.writeHead(Number(process.env.CODE_SERVER_ERROR), {'content-type': process.env.CONTENT_TYPE});
+                    const responseBody = JSON.stringify({ Error: 'Unknown server error' });
+                    response.end(responseBody);
+
+                }
+
+            }
+
+        };
+
+    };
+
+    setBalancerEndIndex = (number: number) => {
+        this.#loadBalancerWorkerIndexEnd = number;
+    };
+
+    setDestinationPort = (port: string) => {
+        this.#destinationPort = port;
+    };
+
+    setBalancerMapPort = (map: Map<number, string>) => {
+        this.#balancerMapPort = map;
     };
 
 }

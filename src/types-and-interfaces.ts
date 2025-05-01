@@ -1,7 +1,14 @@
 import { Server as NodeHttpServer } from 'http';
 
+type BalancerMapPort = Map<number, string>;
+
 interface ServerUtilsInterface {
-    getNewDefaultServer: () => NodeHttpServer;
+    getDataBaseServer: (port: string, host: string) => NodeHttpServer;
+    getLoadBalancer: (port: string, host: string) => NodeHttpServer;
+    getApplicationInstance: (port: string, host: string) => NodeHttpServer;
+    setBalancerEndIndex: (number: number) => void;
+    setDestinationPort: (port: string) => void;
+    setBalancerMapPort: (balancerMapPort: BalancerMapPort) => void;
 }
 
 interface UserToCreate {
@@ -31,7 +38,8 @@ interface DataBaseInterface {
     getUser: (id: string) => DataBaseItem | ErrorResponseBody,
     createNewUser: (user: DataBaseItem) => DataBaseItem,
     updateUser: (id: string, body: UserToUpdate, validProperties: UserProperties) => DataBaseItem | ErrorResponseBody,
-    deleteUser: (id: string) => undefined | ErrorResponseBody,
+    deleteUser: (id: string) => MessageResponseBody | ErrorResponseBody,
+    patchUsers: () => DataBase,
 }
 
 interface ErrorResponseBody {
@@ -42,7 +50,7 @@ interface MessageResponseBody {
     Message: string,
 }
 
-type ResponseBody = DataBase | DataBaseItem | object | ErrorResponseBody | MessageResponseBody | undefined;
+type ResponseBody = DataBase | DataBaseItem | object | ErrorResponseBody | MessageResponseBody;
 
 interface ApiResponse {
     statusCode: number,
@@ -66,4 +74,4 @@ interface ApiInterface {
     processRequest: (method: string, url: string, body: string) => ApiResponse;
 }
 
-export { ServerUtilsInterface, UserToCreate, UserToUpdate, DataBaseInterface, DataBaseItem, DataBaseUpdatedItem, DataBase, ApiResponse, ApiInterface, ErrorResponseBody, MessageResponseBody, BodyRequestValidator, ResponseBody, UserProperties, UserPropertiesKeys };
+export { BalancerMapPort, ServerUtilsInterface, UserToCreate, UserToUpdate, DataBaseInterface, DataBaseItem, DataBaseUpdatedItem, DataBase, ApiResponse, ApiInterface, ErrorResponseBody, MessageResponseBody, BodyRequestValidator, ResponseBody, UserProperties, UserPropertiesKeys };

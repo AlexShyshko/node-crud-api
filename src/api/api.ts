@@ -1,5 +1,5 @@
 import { STATUS_CODES } from 'http';
-import { ApiInterface, UserToCreate, UserToUpdate, ApiResponse, ErrorResponseBody, MessageResponseBody, BodyRequestValidator, ResponseBody, UserProperties, DataBaseItem, DataBaseUpdatedItem } from '../types-and-interfaces';
+import { ApiInterface, UserToCreate, UserToUpdate, ApiResponse, ErrorResponseBody, BodyRequestValidator, ResponseBody, UserProperties, DataBaseItem } from '../types-and-interfaces';
 import { db } from '../db';
 import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
 
@@ -166,6 +166,12 @@ class Api implements ApiInterface {
                     }
     
                     break;
+
+                case 'patch':
+
+                    result.body = db.patchUsers();
+
+                    break;
     
                 default:
     
@@ -188,7 +194,7 @@ class Api implements ApiInterface {
 
     };
 
-    #checkIfError = (responseToCheck: ErrorResponseBody | DataBaseItem | DataBaseUpdatedItem | MessageResponseBody | undefined): responseToCheck is ErrorResponseBody => {
+    #checkIfError = (responseToCheck: ResponseBody): responseToCheck is ErrorResponseBody => {
 
         if (responseToCheck === undefined) {
             return false;

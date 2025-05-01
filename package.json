@@ -9,7 +9,8 @@
     "scripts": {
         "start:dev": "cross-env APPLICATION_USERNAME=RSS_Cross_Checker ts-node-dev src/index.ts",
         "start:prod": "webpack && cross-env APPLICATION_USERNAME=RSS_Cross_Checker node dist/index.js",
-        "start:multi": "",
+        "start:multi": "cross-env CLUSTER_MODE=cluster APPLICATION_USERNAME=RSS_Cross_Checker ts-node-dev src/index.ts",
+        "start:multi-prod": "webpack && cross-env CLUSTER_MODE=cluster APPLICATION_USERNAME=RSS_Cross_Checker node dist/index.js",
         "lint": "eslint src tests",
         "lint:fix": "eslint src tests --fix"
     },
