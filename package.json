@@ -1,0 +1,65 @@
+{
+    "name": "node-crud-api",
+    "version": "1.0.0",
+    "description": "Learning project. Description: https://github.com/AlreadyBored/nodejs-assignments/blob/main/assignments/crud-api/assignment.md",
+    "engines": {
+        "node": "22.14.0"
+    },
+    "main": "src/index.ts",
+    "scripts": {
+        "start:dev": "cross-env APPLICATION_USERNAME=RSS_Cross_Checker ts-node-dev src/index.ts",
+        "start:prod": "webpack && cross-env APPLICATION_USERNAME=RSS_Cross_Checker node dist/index.js",
+        "start:multi": "cross-env CLUSTER_MODE=cluster APPLICATION_USERNAME=RSS_Cross_Checker ts-node-dev src/index.ts",
+        "start:multi-prod": "webpack && cross-env CLUSTER_MODE=cluster APPLICATION_USERNAME=RSS_Cross_Checker node dist/index.js",
+        "lint": "eslint src test",
+        "lint:fix": "eslint src test --fix",
+        "test:valid": "cross-env APPLICATION_USERNAME=RSS_Cross_Checker jest test/valid.test.ts",
+        "test:invalid": "cross-env APPLICATION_USERNAME=RSS_Cross_Checker jest test/invalid.test.ts",
+        "test:multi": "cross-env CLUSTER_MODE=cluster APPLICATION_USERNAME=RSS_Cross_Checker jest test/multi.test.ts"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/AlexShyshko/node-crud-api.git"
+    },
+    "keywords": [
+        "nodejs",
+        "node.js course",
+        "rss",
+        "rs school",
+        "rolling scopes school",
+        "crud-api",
+        "crud api"
+    ],
+    "author": "AlexShyshko",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/AlexShyshko/node-crud-api/pull/1"
+    },
+    "homepage": "https://github.com/AlexShyshko/node-crud-api#readme",
+    "dependencies": {
+        "dotenv": "^16.5.0",
+        "uuid": "^11.1.0"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.25.1",
+        "@types/jest": "^29.5.14",
+        "@types/node": "^22.15.2",
+        "@types/uuid": "^10.0.0",
+        "@typescript-eslint/eslint-plugin": "^8.31.0",
+        "@typescript-eslint/parser": "^8.31.0",
+        "cross-env": "^7.0.3",
+        "eslint": "^9.25.1",
+        "eslint-plugin-jest": "^28.11.0",
+        "eslint-plugin-prettier": "^5.2.6",
+        "eslint-webpack-plugin": "^5.0.1",
+        "jest": "^29.7.0",
+        "prettier": "^3.5.3",
+        "ts-jest": "^29.3.2",
+        "ts-loader": "^9.5.2",
+        "ts-node": "^10.9.2",
+        "ts-node-dev": "^2.0.0",
+        "typescript": "^5.8.3",
+        "webpack": "^5.99.6",
+        "webpack-cli": "^6.0.1"
+    }
+}

@@ -1,0 +1,10 @@
+{
+    "setupFiles": ["<rootDir>/src/index.ts"],
+    "transform": {
+        "^.+\\.tsx?$": ["ts-jest", { "isolatedModules": true }]
+    },
+    "silent": false,
+    "reporters": [
+        "default"
+    ]
+}
