@@ -1,5 +1,5 @@
 import { ServerUtilsInterface } from '../types-and-interfaces';
-import { /*Server as NodeHttpServer, */createServer, RequestListener, IncomingMessage, ServerResponse, request as NodeHttpServerRequest , STATUS_CODES } from 'http';
+import { Server as NodeHttpServer, createServer, RequestListener, IncomingMessage, ServerResponse, request as NodeHttpServerRequest , STATUS_CODES } from 'http';
 import { API } from '../api/api';
 import { mc } from '../message-colorizer/message-colorizer';
 import cluster from 'cluster';
@@ -19,35 +19,59 @@ class ServerUtils implements ServerUtilsInterface {
     };
 
     public getDataBaseServer = (port: string, host: string) => {
-
-        const newServer = createServer();
-        newServer.on('request', this.#getDataBaseRequestListener());
-        newServer.listen({ port: port, host: host });
-        console.log(`${mc.colorize('A new data base server created: ', 'green')}${mc.colorize(host + ':' + port, 'yellow')}`);
         
-        return newServer;
+        return new Promise((resolve) => {
+
+            const newServer = createServer();
+            newServer.on('request', this.#getDataBaseRequestListener());
+            newServer.listen({ port: port, host: host });
+    
+            newServer.on('listening', () => {
+
+                console.log(`${mc.colorize('A new data base server created: ', 'green')}${mc.colorize(host + ':' + port, 'yellow')}`);
+                resolve(newServer);
+
+            });
+
+        }) as Promise<NodeHttpServer>;
 
     };
 
     public getLoadBalancer = (port: string, host: string) => {
 
-        const newServer = createServer();
-        newServer.on('request', this.#getLoadBalancerRequestListener());
-        newServer.listen({ port: port, host: host });
-        console.log(`${mc.colorize('A new load balancer created: ', 'green')}${mc.colorize(host + ':' + port, 'yellow')}`);
+        return new Promise((resolve) => {
 
-        return newServer;
+            const newServer = createServer();
+            newServer.on('request', this.#getLoadBalancerRequestListener());
+            newServer.listen({ port: port, host: host });
+
+            newServer.on('listening', () => {
+
+                console.log(`${mc.colorize('A new load balancer created: ', 'green')}${mc.colorize(host + ':' + port, 'yellow')}`);
+                resolve(newServer);
+
+            });
+
+        }) as Promise<NodeHttpServer>;
 
     };
 
     public getApplicationInstance = (port: string, host: string) => {
 
-        const newServer = createServer();
-        newServer.on('request', this.#getApplicationInstanceRequestListener());
-        newServer.listen({ port: port, host: host });
-        console.log(`${mc.colorize('A new application instance created: ', 'green')}${mc.colorize(host + ':' + port, 'yellow')}`);
+        return new Promise((resolve) => {
 
-        return newServer;
+            const newServer = createServer();
+            newServer.on('request', this.#getApplicationInstanceRequestListener());
+            newServer.listen({ port: port, host: host });
+
+            newServer.on('listening', () => {
+
+                console.log(`${mc.colorize('A new application instance created: ', 'green')}${mc.colorize(host + ':' + port, 'yellow')}`);
+                resolve(newServer);
+
+            });
+            
+        }) as Promise<NodeHttpServer>;
 
     };
 

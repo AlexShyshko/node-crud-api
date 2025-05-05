@@ -3,9 +3,9 @@ import { Server as NodeHttpServer } from 'http';
 type BalancerMapPort = Map<number, string>;
 
 interface ServerUtilsInterface {
-    getDataBaseServer: (port: string, host: string) => NodeHttpServer;
-    getLoadBalancer: (port: string, host: string) => NodeHttpServer;
-    getApplicationInstance: (port: string, host: string) => NodeHttpServer;
+    getDataBaseServer: (port: string, host: string) => Promise<NodeHttpServer>;
+    getLoadBalancer: (port: string, host: string) => Promise<NodeHttpServer>;
+    getApplicationInstance: (port: string, host: string) => Promise<NodeHttpServer>;
     setBalancerEndIndex: (number: number) => void;
     setDestinationPort: (port: string) => void;
     setBalancerMapPort: (balancerMapPort: BalancerMapPort) => void;
