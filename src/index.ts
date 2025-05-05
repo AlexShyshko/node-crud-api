@@ -99,6 +99,11 @@ try {
 	function printHelp() {
 		const helpText = `
 			${mc.colorize('Before checking the task, make sure that you use NodeJS version', 'red')} ${mc.colorize(process.env.NODE_VERSION!, 'red_bgc')}${mc.colorize('. Different version may not work properly!', 'red')}
+			${mc.colorize('Before checking the task complete these prerequisites (', 'yellow')}${mc.colorize('commands', 'blue_bgc')} ${mc.colorize('may vary depending on your development environment):', 'yellow')}
+			${mc.colorize('Clone the repository', 'yellow')} ${mc.colorize('git clone https://github.com/AlexShyshko/node-crud-api.git', 'blue_bgc')}
+			${mc.colorize('Enter the repository', 'yellow')} ${mc.colorize('cd node-crud-api', 'blue_bgc')}
+			${mc.colorize('Choose the correct branch', 'yellow')} ${mc.colorize('git checkout crud-api', 'blue_bgc')}
+			${mc.colorize('Install dependencies', 'yellow')} ${mc.colorize('npm install', 'blue_bgc')}
 			${mc.colorize('The application supports these predefined scripts:', 'green')}
 			${mc.colorize('npm run start:dev', 'blue_bgc')} ${mc.colorize('- a single cluster mode.', 'green')}
 			${mc.colorize('npm run start:prod', 'blue_bgc')} ${mc.colorize('- the same bundled in one js file.', 'green')}
